@@ -16,17 +16,23 @@
             <v-card-title class="pb-0">Results View Data</v-card-title>
           </v-col>
           <v-spacer />
-          <v-col cols="4" sm="auto" class="text-right pl-6 pb-0">
+          <v-col cols="3" sm="auto" class="text-right pl-6 pb-0">
+            <v-switch
+              v-model="displayUnviewedControls"
+              label="Show Only Unviewed"
+            />
+          </v-col>
+          <v-col cols="3" sm="auto" class="text-right pl-6 pb-0">
             <v-switch v-model="syncTabs" label="Sync Tabs" />
           </v-col>
-          <v-col cols="4" sm="auto" class="text-right pb-0">
+          <v-col cols="3" sm="auto" class="text-right pb-0">
             <v-switch
               v-model="singleExpand"
               label="Single Expand"
               @change="handleToggleSingleExpand"
             />
           </v-col>
-          <v-col cols="4" sm="auto" class="text-right pb-0">
+          <v-col cols="3" sm="auto" class="text-right pb-0">
             <v-switch v-model="expandAll" label="Expand All" class="mr-5" />
           </v-col>
         </v-row>
@@ -73,6 +79,10 @@
         <template #tags>
           <ColumnHeader text="800-53 Controls & CCIs" sort="disabled" />
         </template>
+
+        <template #viewed>
+          <ColumnHeader text="Viewed" sort="disabled" />
+        </template>
       </ResponsiveRowSwitch>
     </div>
 
@@ -90,7 +100,9 @@
           :control="item.control"
           :expanded="expanded.includes(item.key)"
           :show-impact="showImpact"
+          :viewed-controls="viewedControls"
           @toggle="toggle(item.key)"
+          @control-viewed="controlViewed"
         />
         <ControlRowDetails
           v-if="expanded.includes(item.key)"
@@ -160,6 +172,23 @@ export default class ControlTable extends Vue {
   sortStatus: Sort = 'none';
   sortSet: Sort = 'none';
   sortSeverity: Sort = 'none';
+
+  // Used for viewed/unviewed controls.
+  viewedControls: context.ContextualizedControl[] = [];
+  displayUnviewedControls = true;
+  viewed = false;
+
+  controlViewed(control: context.ContextualizedControl) {
+    const alreadyViewed = this.viewedControls.findIndex((controlId) => controlId.data.id === control.data.id);
+    // If the control hasn't been marked as viewed yet, mark it as viewed.
+    if(alreadyViewed === -1) {
+      this.viewedControls.push(control);
+    }
+    // Else, remove it from the view controls array.
+    else {
+      this.viewedControls.splice(alreadyViewed, 1);
+    }
+  }
 
   mounted() {
     this.onResize();
@@ -335,9 +364,24 @@ export default class ControlTable extends Vue {
         factor = -1;
       }
     } else {
-      return this.raw_items;
+      // Displays only unviewed controls.
+      if(this.displayUnviewedControls) {
+        return this.raw_items.filter((val) => !this.viewedControls.includes(val.control));
+      }
+      // Displays unviewed and viewed controls.
+      else {
+        return this.raw_items;
+      }
     }
-    return this.raw_items.sort((a, b) => cmp(a, b) * factor);
+
+    // Displays only unviewed sorted controls.
+    if(this.displayUnviewedControls) {
+      return this.raw_items.sort((a, b) => cmp(a, b) * factor).filter((val) => !this.viewedControls.includes(val.control))
+    }
+    // Displays sorted unviewed and viewed controls.
+    else {
+      return this.raw_items.sort((a, b) => cmp(a, b) * factor);
+    }
   }
 }
 </script>
