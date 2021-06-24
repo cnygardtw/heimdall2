@@ -104,9 +104,9 @@
           :control="item.control"
           :expanded="expanded.includes(item.key)"
           :show-impact="showImpact"
-          :viewed-controls="viewedControls"
+          :viewed-controls="viewedControlIds"
           @toggle="toggle(item.key)"
-          @control-viewed="controlViewed"
+          @control-viewed="toggleControlViewed"
         />
         <ControlRowDetails
           v-if="expanded.includes(item.key)"
@@ -178,19 +178,19 @@ export default class ControlTable extends Vue {
   sortSeverity: Sort = 'none';
 
   // Used for viewed/unviewed controls.
-  viewedControls: context.ContextualizedControl[] = [];
+  viewedControlIds: string[] = [];
   displayUnviewedControls = true;
   viewed = false;
 
-  controlViewed(control: context.ContextualizedControl) {
-    const alreadyViewed = this.viewedControls.findIndex((controlId) => controlId.data.id === control.data.id);
+  toggleControlViewed(control: context.ContextualizedControl) {
+    const alreadyViewed = this.viewedControlIds.indexOf(control.data.id)
     // If the control hasn't been marked as viewed yet, mark it as viewed.
     if(alreadyViewed === -1) {
-      this.viewedControls.push(control);
+      this.viewedControlIds.push(control.data.id);
     }
     // Else, remove it from the view controls array.
     else {
-      this.viewedControls.splice(alreadyViewed, 1);
+      this.viewedControlIds.splice(alreadyViewed, 1);
     }
   }
 
@@ -370,7 +370,7 @@ export default class ControlTable extends Vue {
     } else {
       // Displays only unviewed controls.
       if(this.displayUnviewedControls) {
-        return this.raw_items.filter((val) => !this.viewedControls.includes(val.control));
+        return this.raw_items.filter((val) => !this.viewedControlIds.includes(val.control.data.id));
       }
       // Displays unviewed and viewed controls.
       else {
@@ -380,7 +380,7 @@ export default class ControlTable extends Vue {
 
     // Displays only unviewed sorted controls.
     if(this.displayUnviewedControls) {
-      return this.raw_items.sort((a, b) => cmp(a, b) * factor).filter((val) => !this.viewedControls.includes(val.control))
+      return this.raw_items.sort((a, b) => cmp(a, b) * factor).filter((val) => !this.viewedControlIds.includes(val.control.data.id))
     }
     // Displays sorted unviewed and viewed controls.
     else {

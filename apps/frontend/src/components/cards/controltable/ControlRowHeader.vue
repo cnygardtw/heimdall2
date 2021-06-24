@@ -129,7 +129,7 @@ export default class ControlRowHeader extends mixins(HtmlSanitizeMixin) {
   @Prop({type: Object, required: true})
   readonly control!: context.ContextualizedControl;
   @Prop({type: Array, required: true})
-  readonly viewedControls!: context.ContextualizedControl[];
+  readonly viewedControls!: string[];
   @Prop({type: Boolean, default: false}) readonly controlExpanded!: boolean;
   @Prop({type: Boolean, default: false}) readonly showImpact!: boolean;
 
@@ -153,8 +153,7 @@ export default class ControlRowHeader extends mixins(HtmlSanitizeMixin) {
   }
 
   get wasViewed(): boolean {
-    this.controlWasViewed = this.viewedControls.includes(this.control);
-    return this.controlWasViewed;
+    return this.controlWasViewed = this.viewedControls.indexOf(this.control.data.id) !== -1
   }
 
   set wasViewed(value: boolean) {
