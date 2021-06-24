@@ -8,7 +8,10 @@
         <v-divider />
         <slot name="severity" />
         <v-divider />
+        <slot name="viewed" />
+        <v-divider />
         <slot name="tags" />
+        <v-divider />
       </v-card>
     </v-col>
 
@@ -18,10 +21,6 @@
         <v-divider />
         <slot name="title" />
       </v-card>
-    </v-col>
-
-    <v-col align="center" class="pa-0" :cols="1">
-      <slot name="viewed" />
     </v-col>
   </v-row>
 </template>

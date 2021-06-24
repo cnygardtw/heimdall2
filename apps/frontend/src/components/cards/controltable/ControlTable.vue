@@ -81,7 +81,11 @@
         </template>
 
         <template #viewed>
-          <ColumnHeader text="Viewed" sort="disabled" />
+          <ColumnHeader
+            :class="$vuetify.breakpoint.lgAndUp ? 'pl-9' : ''"
+            text="Viewed"
+            sort="disabled"
+          />
         </template>
       </ResponsiveRowSwitch>
     </div>

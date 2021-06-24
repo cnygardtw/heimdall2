@@ -32,7 +32,7 @@
       </v-card>
     </v-col>
 
-    <v-col align="center" class="pa-0" :cols="1">
+    <v-col class="pa-0" :cols="1">
       <slot name="viewed" />
     </v-col>
   </v-row>

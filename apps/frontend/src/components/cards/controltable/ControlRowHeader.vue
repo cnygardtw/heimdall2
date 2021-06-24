@@ -84,12 +84,16 @@
     </template>
 
     <template #viewed>
-      <v-layout justify-center>
+      <v-layout
+        class="py-0 my-0 pt-2"
+        :justify-center="$vuetify.breakpoint.lgAndUp"
+      >
         <v-checkbox
           v-model="wasViewed"
           color="primary"
           hide-details
-          class="align-center justify-center"
+          :label="$vuetify.breakpoint.lgAndUp ? '' : 'Viewed'"
+          class="align-center justify-center py-0 my-0 pl-2"
           @click="$emit('control-viewed', control)"
         />
       </v-layout>
