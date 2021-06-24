@@ -12,12 +12,16 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="6">
+    <v-col class="pa-0" :cols="5">
       <v-card tile flat class="d-flex flex-column fill-height">
         <slot name="id" />
         <v-divider />
         <slot name="title" />
       </v-card>
+    </v-col>
+
+    <v-col align="center" class="pa-0" :cols="1">
+      <slot name="viewed" />
     </v-col>
   </v-row>
 </template>
