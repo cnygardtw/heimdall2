@@ -84,11 +84,15 @@
     </template>
 
     <template #viewed>
-      <v-checkbox
-        v-model="wasViewed"
-        color="primary"
-        @click="$emit('control-viewed', control)"
-      />
+      <v-layout justify-center>
+        <v-checkbox
+          v-model="wasViewed"
+          color="primary"
+          hide-details
+          class="align-center justify-center"
+          @click="$emit('control-viewed', control)"
+        />
+      </v-layout>
     </template>
   </ResponsiveRowSwitch>
 </template>
@@ -150,11 +154,7 @@ export default class ControlRowHeader extends mixins(HtmlSanitizeMixin) {
   }
 
   set wasViewed(value: boolean) {
-    if(value) {
-      this.controlWasViewed = true;
-    } else {
-      this.controlWasViewed = false;
-    }
+    this.controlWasViewed = value;
   }
 
   severity_arrow_count(severity: string): number {
