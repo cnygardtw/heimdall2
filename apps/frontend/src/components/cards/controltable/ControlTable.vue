@@ -80,11 +80,13 @@
           <ColumnHeader text="800-53 Controls & CCIs" sort="disabled" />
         </template>
 
-        <template #viewed>
+        <template #viewed class="my-2 px-1">
           <ColumnHeader
-            :class="$vuetify.breakpoint.lgAndUp ? 'pl-9' : ''"
-            text="Viewed"
+            text="Controls Viewed"
             sort="disabled"
+            :viewed-header="true"
+            :number-of-viewed-controls="viewedControlIds.length"
+            :number-of-all-controls="raw_items.length"
           />
         </template>
       </ResponsiveRowSwitch>
