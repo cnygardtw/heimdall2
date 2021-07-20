@@ -1,5 +1,6 @@
 import {ValidationPipe} from '@nestjs/common';
 import {NestFactory} from '@nestjs/core';
+import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import {json} from 'express';
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
@@ -12,7 +13,9 @@ import helmet = require('helmet');
 import passport = require('passport');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug']
+  });
   const configService = app.get<ConfigService>(ConfigService);
   app.use(helmet());
   app.use(
@@ -93,6 +96,17 @@ async function bootstrap() {
       whitelist: true
     })
   );
+
+  const config = new DocumentBuilder()
+    .addBearerAuth()
+    .setTitle('Heimdall Server')
+    .setDescription('Backend API providing Compliance result data')
+    .setVersion('0.5.0')
+    .addTag('heimdall')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(configService.get('PORT') || 3000);
 }
 bootstrap();

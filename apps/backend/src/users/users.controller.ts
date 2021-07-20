@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   UsePipes
 } from '@nestjs/common';
+import {ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
 import {AuthzService} from '../authz/authz.service';
 import {Action} from '../casl/casl-ability.factory';
 import {ConfigService} from '../config/config.service';
@@ -32,6 +33,7 @@ import {UpdateUserDto} from './dto/update-user.dto';
 import {UserDto} from './dto/user.dto';
 import {UsersService} from './users.service';
 
+@ApiBearerAuth()
 @UseInterceptors(LoggingInterceptor)
 @Controller('users')
 export class UsersController {
@@ -41,6 +43,7 @@ export class UsersController {
     private readonly authz: AuthzService
   ) {}
 
+  @ApiOperation({summary: 'Find all users'})
   @Get('/user-find-all')
   @UseGuards(JwtAuthGuard)
   async findAllUsers(@Request() request: {user: User}): Promise<SlimUserDto[]> {
@@ -50,6 +53,7 @@ export class UsersController {
     return users.map((user) => new SlimUserDto(user));
   }
 
+  @ApiOperation({summary: 'Find user by id'})
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findUserById(
@@ -64,6 +68,7 @@ export class UsersController {
     return new UserDto(user);
   }
 
+  @ApiOperation({summary: 'Find all admin users (perhaps not correct)'})
   @Get()
   @UseGuards(JwtAuthGuard)
   async adminFindAllUsers(
@@ -76,6 +81,7 @@ export class UsersController {
     return users.map((user) => new UserDto(user));
   }
 
+  @ApiOperation({summary: 'Create a user account'})
   @Post()
   @UsePipes(new PasswordsMatchPipe(), new PasswordComplexityPipe())
   @UseFilters(new UniqueConstraintErrorFilter())
@@ -98,6 +104,7 @@ export class UsersController {
     return new UserDto(await this.usersService.create(createUserDto));
   }
 
+  @ApiOperation({summary: 'Update a specific user record'})
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
@@ -119,6 +126,7 @@ export class UsersController {
     );
   }
 
+  @ApiOperation({summary: 'Delete a specific user record'})
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(
@@ -135,6 +143,7 @@ export class UsersController {
     );
   }
 
+  @ApiOperation({summary: 'Delete all users'})
   @UseGuards(TestGuard)
   @Post('clear')
   async clear(): Promise<void> {

@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import {ApiBearerAuth, ApiOperation} from '@nestjs/swagger';
 import {AuthzService} from '../authz/authz.service';
 import {Action} from '../casl/casl-ability.factory';
 import {EvaluationsService} from '../evaluations/evaluations.service';
@@ -25,6 +26,7 @@ import {GroupDto} from './dto/group.dto';
 import {RemoveUserFromGroupDto} from './dto/remove-user-from-group.dto';
 import {GroupsService} from './groups.service';
 
+@ApiBearerAuth()
 @Controller('groups')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(LoggingInterceptor)
@@ -36,6 +38,7 @@ export class GroupsController {
     private readonly authz: AuthzService
   ) {}
 
+  @ApiOperation({summary: 'Find all groups readable by a user'})
   @Get()
   async findAll(@Request() request: {user: User}): Promise<GroupDto[]> {
     const abac = this.authz.abac.createForUser(request.user);
@@ -46,12 +49,14 @@ export class GroupsController {
     return groups.map((group) => new GroupDto(group));
   }
 
+  @ApiOperation({summary: 'Find all groups to which a user belongs'})
   @Get('/my')
   async findForUser(@Request() request: {user: User}): Promise<GroupDto[]> {
     const groups = await request.user.$get('groups', {include: [User]});
     return groups.map((group) => new GroupDto(group));
   }
 
+  @ApiOperation({summary: 'Create a new group to which the user belongs'})
   @Post()
   async create(
     @Request() request: {user: User},
@@ -62,6 +67,7 @@ export class GroupsController {
     return new GroupDto(group, 'owner');
   }
 
+  @ApiOperation({summary: 'Add a user to a group'})
   @Post('/:id/user')
   async addUserToGroup(
     @Param('id') id: string,
@@ -82,6 +88,7 @@ export class GroupsController {
     return new GroupDto(group);
   }
 
+  @ApiOperation({summary: 'Remove a user from a group'})
   @Delete('/:id/user')
   async removeUserFromGroup(
     @Param('id') id: string,
@@ -99,6 +106,7 @@ export class GroupsController {
     );
   }
 
+  @ApiOperation({summary: 'Add an evaluation to a group'})
   @Post('/:id/evaluation')
   async addEvaluationToGroup(
     @Param('id') id: string,
@@ -118,6 +126,7 @@ export class GroupsController {
     return new GroupDto(group);
   }
 
+  @ApiOperation({summary: 'Remove an evaluation from a group'})
   @Delete('/:id/evaluation')
   async removeEvaluationFromGroup(
     @Param('id') id: string,
@@ -139,6 +148,7 @@ export class GroupsController {
     );
   }
 
+  @ApiOperation({summary: 'Find a specific group by id'})
   @Get(':id')
   async findById(
     @Request() request: {user: User},
@@ -151,6 +161,7 @@ export class GroupsController {
     return new GroupDto(group, 'owner');
   }
 
+  @ApiOperation({summary: 'Update a specific group record'})
   @Put(':id')
   async update(
     @Request() request: {user: User},
@@ -165,6 +176,7 @@ export class GroupsController {
     );
   }
 
+  @ApiOperation({summary: 'Delete a specific group record'})
   @Delete(':id')
   async remove(
     @Request() request: {user: User},

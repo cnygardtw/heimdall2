@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import {ApiBearerAuth, ApiOperation} from '@nestjs/swagger';
 import {AuthzService} from '../authz/authz.service';
 import {Action} from '../casl/casl-ability.factory';
 import {EvaluationsService} from '../evaluations/evaluations.service';
@@ -20,6 +21,7 @@ import {CreateEvaluationTagDto} from './dto/create-evaluation-tag.dto';
 import {EvaluationTagDto} from './dto/evaluation-tag.dto';
 import {EvaluationTagsService} from './evaluation-tags.service';
 
+@ApiBearerAuth()
 @Controller('evaluation-tags')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(LoggingInterceptor)
@@ -30,6 +32,7 @@ export class EvaluationTagsController {
     private readonly authz: AuthzService
   ) {}
 
+  @ApiOperation({summary: 'Retrieve all evaluation tags accessible to the user'})
   @Get()
   async index(@Request() request: {user: User}): Promise<EvaluationTagDto[]> {
     const abac = this.authz.abac.createForUser(request.user);
@@ -42,6 +45,7 @@ export class EvaluationTagsController {
     );
   }
 
+  @ApiOperation({summary: 'Retrieve a specific evaluation tag record'})
   @Get(':id')
   async findById(
     @Param('id') id: string,
@@ -56,6 +60,7 @@ export class EvaluationTagsController {
     return new EvaluationTagDto(evaluationTag);
   }
 
+  @ApiOperation({summary: 'Create a specific evaluation tag record'})
   @Post(':evaluationId')
   async create(
     @Param('evaluationId') evaluationId: string,
@@ -76,6 +81,7 @@ export class EvaluationTagsController {
     );
   }
 
+  @ApiOperation({summary: 'Delete a specific evaluation tag record'})
   @Delete(':id')
   async remove(
     @Param('id') id: string,

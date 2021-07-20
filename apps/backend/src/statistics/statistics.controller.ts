@@ -6,6 +6,7 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import {ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
 import {AuthzService} from '../authz/authz.service';
 import {Action} from '../casl/casl-ability.factory';
 import {JwtAuthGuard} from '../guards/jwt-auth.guard';
@@ -14,6 +15,7 @@ import {User} from '../users/user.model';
 import {StatisticsDTO} from './dto/statistics.dto';
 import {StatisticsService} from './statistics.service';
 
+@ApiBearerAuth()
 @Controller('statistics')
 @UseInterceptors(LoggingInterceptor)
 export class StatisticsController {
@@ -22,6 +24,7 @@ export class StatisticsController {
     private readonly authz: AuthzService
   ) {}
 
+  @ApiOperation({summary: 'Retrieve heimdall statistics'})
   @Get()
   @UseGuards(JwtAuthGuard)
   async getHeimdallStatistics(

@@ -7,6 +7,7 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import {ApiParam, ApiBody, ApiOperation} from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Request} from 'express';
 import {AuthenticationExceptionFilter} from '../filters/authentication-exception.filter';
@@ -14,12 +15,20 @@ import {LocalAuthGuard} from '../guards/local-auth.guard';
 import {LoggingInterceptor} from '../interceptors/logging.interceptor';
 import {User} from '../users/user.model';
 import {AuthnService} from './authn.service';
+import {LoginDto} from './dto/login.dto';
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('authn')
 export class AuthnController {
   constructor(private readonly authnService: AuthnService) {}
 
+  @ApiOperation({summary: 'Login via user/password payload'})
+  @ApiBody({
+    type: LoginDto,
+    description: 'user/password payload',
+    required: true,
+    isArray: false
+  })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -28,6 +37,13 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via LDAP user payload'})
+  @ApiBody({
+    type: LoginDto,
+    description: 'user/password payload',
+    required: true,
+    isArray: false
+  })
   @UseGuards(AuthGuard('ldap'))
   @Post('login/ldap')
   async loginToLDAP(
@@ -36,6 +52,8 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via Github user payload'})
+  @ApiParam({ name: 'username', type: 'string' })
   @Get('github')
   @UseGuards(AuthGuard('github'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -45,6 +63,7 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via Github callback'})
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -53,6 +72,8 @@ export class AuthnController {
     await this.setSessionCookies(req, session);
   }
 
+  @ApiOperation({summary: 'Login via Gitlab user payload'})
+  @ApiParam({ name: 'username', type: 'string' })
   @Get('gitlab')
   @UseGuards(AuthGuard('gitlab'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -62,6 +83,7 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via Gitlab callback'})
   @Get('gitlab/callback')
   @UseGuards(AuthGuard('gitlab'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -70,6 +92,8 @@ export class AuthnController {
     await this.setSessionCookies(req, session);
   }
 
+  @ApiOperation({summary: 'Login via Google user payload'})
+  @ApiParam({ name: 'username', type: 'string' })
   @Get('google')
   @UseGuards(AuthGuard('google'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -79,6 +103,7 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via Google callback'})
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -87,6 +112,8 @@ export class AuthnController {
     await this.setSessionCookies(req, session);
   }
 
+  @ApiOperation({summary: 'Login via Okta user payload'})
+  @ApiParam({ name: 'username', type: 'string' })
   @Get('okta')
   @UseGuards(AuthGuard('okta'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -96,6 +123,7 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via Okta callback'})
   @Get('okta/callback')
   @UseGuards(AuthGuard('okta'))
   @UseFilters(new AuthenticationExceptionFilter())
@@ -104,6 +132,8 @@ export class AuthnController {
     await this.setSessionCookies(req, session);
   }
 
+  @ApiOperation({summary: 'Login via OIDC user payload'})
+  @ApiParam({ name: 'username', type: 'string' })
   @Get('oidc')
   @UseGuards(AuthGuard('oidc'))
   async loginToOIDC(
@@ -112,6 +142,7 @@ export class AuthnController {
     return this.authnService.login(req.user as User);
   }
 
+  @ApiOperation({summary: 'Login via OIDC callback'})
   @Get('oidc/callback')
   @UseGuards(AuthGuard('oidc'))
   async getUserFromOIDC(@Req() req: Request): Promise<void> {

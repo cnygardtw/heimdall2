@@ -11,7 +11,9 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - PGDATA=/var/lib/postgresql/data/pgdata
     expose:
-      - "5432"
+      - '5432'
+    ports:
+      - '5432:5432'
   server:
     image: mitre/heimdall2:release-latest
     restart: unless-stopped
@@ -20,11 +22,12 @@ services:
       - DATABASE_HOST=database
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
     env_file: .env-prod
+    expose:
+      - '3000'
     ports:
-      - "3000"
-      - "3000:3000"
+      - '8000:3000'
     depends_on:
-      - "database"
+      - 'database'
   nginx:
     image: nginx:alpine
     environment:
@@ -33,7 +36,7 @@ services:
       - ./nginx/conf:/etc/nginx/templates
       - ./nginx/certs:/etc/nginx/cert/
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     depends_on:
-      - "server"
+      - 'server'

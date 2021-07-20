@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import {ApiBearerAuth, ApiOperation} from '@nestjs/swagger';
 import {FileInterceptor} from '@nestjs/platform-express';
 import _ from 'lodash';
 import {AuthzService} from '../authz/authz.service';
@@ -29,6 +30,7 @@ import {EvaluationDto} from './dto/evaluation.dto';
 import {UpdateEvaluationDto} from './dto/update-evaluation.dto';
 import {EvaluationsService} from './evaluations.service';
 
+@ApiBearerAuth()
 @Controller('evaluations')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(LoggingInterceptor)
@@ -39,6 +41,8 @@ export class EvaluationsController {
     private readonly configService: ConfigService,
     private readonly authz: AuthzService
   ) {}
+
+  @ApiOperation({summary: 'Retrieve a specific evaluation record'})
   @Get(':id')
   async findById(
     @Param('id') id: string,
@@ -50,6 +54,7 @@ export class EvaluationsController {
     return new EvaluationDto(evaluation, abac.can(Action.Update, evaluation));
   }
 
+  @ApiOperation({summary: 'Retrieve the groups associated with an evaluation'})
   @Get(':id/groups')
   async groupsForEvaluation(
     @Param('id') id: string,
@@ -65,6 +70,7 @@ export class EvaluationsController {
     return evaluationGroups.map((group) => new GroupDto(group));
   }
 
+  @ApiOperation({summary: 'Find all evaluations for which the user has permission to access'})
   @Get()
   async findAll(@Request() request: {user: User}): Promise<EvaluationDto[]> {
     const abac = this.authz.abac.createForUser(request.user);
@@ -80,6 +86,7 @@ export class EvaluationsController {
     );
   }
 
+  @ApiOperation({summary: 'Create a new evaluation record'})
   @Post()
   @UseInterceptors(FileInterceptor('data'), CreateEvaluationInterceptor)
   async create(
@@ -118,6 +125,7 @@ export class EvaluationsController {
     return _.omit(createdDto, 'data');
   }
 
+  @ApiOperation({summary: 'Update a specific evaluation record'})
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -139,6 +147,7 @@ export class EvaluationsController {
     );
   }
 
+  @ApiOperation({summary: 'Deletete a specific evaluation record'})
   @Delete(':id')
   async remove(
     @Param('id') id: string,
